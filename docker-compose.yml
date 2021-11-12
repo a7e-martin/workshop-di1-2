@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+    web:
+        build: 
+            context: ./client
+            dockerfile: Dockerfile.dev
+        ports:
+            - "8080:8080"
+        command: npm run serve
+        volumes:
+            - ./client:/app:cached
+    api:
+        build: 
+            context: ./server
+            dockerfile: Dockerfile.dev
+        environment:
+            - PORT=8081
+        ports:
+            - "8081:8081"
+            - "9229:9229"
+        command: npm run dev
+        volumes:
+            - ./server:/api:cached
+            - /api/node_modules
+    db:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: Azerty@123
+        volumes:
+            - mysql-data:/var/lib/mysql
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8090:8080
+volumes:
+    mysql-data:
